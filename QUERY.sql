@@ -1,10 +1,3 @@
--- =========================================================================
--- SYSTEM: Football Ticket Booking System Database Setup Template
--- DESCRIPTION: Pseudo-DDL Template for Table Creation & Data Insertion
--- INSTRUCTIONS: Replace 'TYPE' and the constraint placeholders with your own
---               actual data types, relational keys, and check criteria.
--- =========================================================================
-
 -- DROP TABLES IF THEY ALREADY EXIST TO PREVENT CONFLICTS
 DROP TABLE IF EXISTS Bookings;
 DROP TABLE IF EXISTS Matches;
@@ -14,50 +7,35 @@ DROP TABLE IF EXISTS Users;
 -- 1. CREATE USERS TABLE
 -- =========================================================================
 CREATE TABLE Users (
-    user_id TYPE,
-    full_name TYPE,
-    email TYPE,
-    role TYPE,
-    phone_number TYPE,
-    
-    -- Write your constraint to make 'user_id' the Primary Key
-    -- Write your constraint to ensure 'email' values are never duplicated
-    -- Write your check constraint to restrict 'role' to specific allowed strings
+    user_id serial primary key,
+    full_name varchar(50) not null,
+    email varchar(50) unique,
+    role varchar(20) check (role in ('Ticket Manager','Football Fan')),
+    phone_number varchar(20)
 );
 
 -- =========================================================================
 -- 2. CREATE MATCHES TABLE
 -- =========================================================================
 CREATE TABLE Matches (
-    match_id TYPE,
-    fixture TYPE,
-    tournament_category TYPE,
-    base_ticket_price TYPE,
-    match_status TYPE,
-    
-    -- Write your constraint to make 'match_id' the Primary Key
-    -- Write your check constraint to prevent negative ticket prices
-    -- Write your check constraint to restrict 'match_status' values
+    match_id serial primary key,
+    fixture varchar(100),
+    tournament_category varchar(50),
+    base_ticket_price decimal(10,2) check (base_ticket_price>=0),
+    match_status varchar(20) check (match_status in ('Available', 'Selling Fast', 'Sold Out', 'Postponed'))
 );
 
 -- =========================================================================
 -- 3. CREATE BOOKINGS TABLE
 -- =========================================================================
 CREATE TABLE Bookings (
-    booking_id TYPE,
-    user_id TYPE,
-    match_id TYPE,
-    seat_number TYPE,
-    payment_status TYPE,
-    total_cost TYPE,
-    
-    -- Write your constraint to make 'booking_id' the Primary Key
-    -- Write your Foreign Key constraint linking 'user_id' to the Users table
-    -- Write your Foreign Key constraint linking 'match_id' to the Matches table
-    -- Write your check constraint to ensure 'total_cost' is non-negative
-    -- Write your check constraint to restrict 'payment_status' values
+    booking_id serial primary key,
+    user_id int references users(user_id),
+    match_id int references matches(match_id),
+    seat_number varchar(20),
+    payment_status varchar(20) check (payment_status in ('Pending', 'Confirmed', 'Cancelled', 'Refunded')),
+    total_cost decimal(10,2) check (total_cost >= 0)
 );
-
 
 -- =========================================================================
 -- DATA SEEDING: INSERT SAMPLE DATA INTO USERS
@@ -87,3 +65,9 @@ INSERT INTO Bookings (booking_id, user_id, match_id, seat_number, payment_status
 (503, 2, 101, 'A-13', 'Confirmed', 150.00),
 (504, 2, 101, NULL, NULL, 150.00),
 (505, 3, 102, 'C-20', 'Pending', 120.00);
+
+
+
+                   -------  Queries ---------
+
+
